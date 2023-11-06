@@ -1,0 +1,97 @@
+{{template "header"}}
+
+            <div class="masthead clearfix">
+                <div class="inner">
+                    <nav>
+                        <header>
+                            <ul class="nav masthead-nav">
+                                <li class="active"><a>Home</a></li>
+                                <li onclick="location.href='/logout';">Logout</li>
+                            </ul>
+                        </header>
+                    </nav>
+                </div>
+            </div>
+
+
+            <div class="inner cover well">
+                <b>
+                    <p> Welcome  {{.user.Name}} - {{.user.Email}} - {{.user.Password}}, click on the botton to join to the common chat or create a new one</p>
+                </b> 
+
+                <form class="form-signin" method="post" action="/joincommon">
+                    <h2 class="form-signin-heading">Common chat</h2>
+                    <button class="btn btn-lg btn-primary" type="submit">
+                        Join
+                    </button>
+                </form>
+                
+                <form class="form-signin" method="post" action="/createchat">
+                    <h2 class="form-signin-heading">New Chat</h2>
+                    <p> To create a new chat room </p>
+                    <label for="input" class="sr-only">Name of the new chat</label>
+                    <input type="text" id="input" class="form-control" placeholder="name" name="name" required autofocus>
+                    <button class="btn btn-lg btn-primary" type="submit">
+                        Create and Join
+                    </button>
+                </form>
+
+                <form class="form-signin" id="form-join-chat" method="post" action="/join/">
+                    <h2 class="form-signin-heading">Select Chat</h2>
+                    <p> Go into an existing chat room </p>
+                    <!-- <select class="form-select" name="select" id="select-chat" aria-label="Default select example">
+                    </select> -->
+                    <!-- Single button -->
+                    <div class="btn-group" id="select-chat">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="select-button">
+                        Select chat <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" id="select-ul">
+                        </ul>
+                    </div>
+                    <button class="btn btn-lg btn-primary" type="submit">
+                        Join
+                    </button>
+                </form>
+            </div>
+
+            <script>
+
+                function selected_value(ev) {
+                    const value = ev.target.innerHTML
+                    // const value = ev.target.textContent
+                    // const value = ev.target.innerText
+                    console.log("selected_value: ", "|"+value+ "|");
+                    
+                    const button = document.getElementById("select-button");
+                    button.innerHTML = value;
+
+                    document.getElementById("form-join-chat").action = `/join/${value}`
+                }
+
+                // jquery 
+                $(function() {
+                    $.get( "http://" + window.location.host + "/chatslist", function( data ) {
+                        
+                        try { 
+                            for (var i = 0; i < data["list"].length; i++) {
+                                list_name = data["list"][i]
+                                
+                                const ulchats = document.getElementById("select-ul");
+                                const li = document.createElement("li");
+                                li.value = list_name
+                                li.textContent = list_name
+                                li.addEventListener("click", selected_value)
+                                ulchats.appendChild(li);
+
+                            }
+                        } catch (e) {
+                            console.log(e);
+                        }
+
+                    });
+                });
+
+            </script>
+
+{{template "footer"}}

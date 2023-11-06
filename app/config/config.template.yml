@@ -1,0 +1,10 @@
+# configuration for the application
+
+## as note, always in minuscula and 
+## should match with the structure defined in thec onfig.go
+
+# the variables can setted like this example:
+port: 8000
+appname: Example
+
+# an alternative is used the env variables defined by k8s or systems 

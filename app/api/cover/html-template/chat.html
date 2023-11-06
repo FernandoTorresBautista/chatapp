@@ -1,0 +1,63 @@
+{{template "header"}}
+
+    <div class="masthead clearfix">
+        <div class="inner">
+            <nav>
+                <header>
+                    <ul class="nav masthead-nav">
+                        <li class="active"><a>Home</a></li>
+                        <li onclick="location.href='/logout';">Logout</li>
+                    </ul>
+                </header>
+            </nav>
+        </div>
+    </div>
+
+
+    <div class="inner cover well tablescroll">
+        <ul class="list-unstyled" id="messages"></ul>
+        <form>
+            <textarea class="form-control" rows="1" id="message-input"></textarea>
+            <button class="btn btn-sm btn-primary" id="send-button">Send</button>
+        </form>
+    </div>
+
+    <p id="chatID" style="display: none;">{{.chatID}}</p>
+    
+    <script>
+        setTimeout(function() {}, 500);
+
+        const chatID = document.getElementById("chatID").innerHTML;
+        const socket = new WebSocket("ws://" + window.location.host + `/chat/${chatID}`);
+
+        socket.onopen = (event) => {
+            console.log("WebSocket connection opened.");
+        };
+
+        socket.onmessage = (event) => {
+            const messages = document.getElementById("messages");
+            
+            const lin = $(messages).find("li").size();
+            if (lin == 49) {
+                messages.removeChild(messages.firstChild);
+            }
+
+            const li = document.createElement("li");
+            li.className = "msg-received"
+            li.textContent = event.data;
+            messages.appendChild(li);
+        };
+
+        document.getElementById("send-button").addEventListener("click", (ev) => {
+            ev.preventDefault();
+            const messageInput = document.getElementById("message-input");
+            const message = messageInput.value;
+            socket.send(message);
+            // clena the message
+            messageInput.value = "";
+        });
+
+    </script>
+
+
+{{template "footer"}}
