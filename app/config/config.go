@@ -4,6 +4,7 @@ import (
 	"github.com/jinzhu/configor"
 )
 
+// Configuration ...
 type Configuration struct {
 	AppName string   `default:"example" env:"APP_NAME"`
 	Port    uint     `default:"8000" env:"PORT"`
@@ -27,8 +28,9 @@ type Configuration struct {
 	}
 
 	RabbitMQ struct {
-		User     string `default:"user"`     // defualt user for rabbit
-		Password string `default:"password"` // default password for rabbit
+		Host     string `default:"host" env:"RABBITMQ_HOST"`       // defualt user for rabbit
+		User     string `default:"user" env:"RABBIT_USER"`         // defualt user for rabbit
+		Password string `default:"password" env:"RABBIT_PASSWORD"` // default password for rabbit
 	}
 }
 

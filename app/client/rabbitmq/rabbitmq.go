@@ -12,17 +12,19 @@ import (
 type Rabbit struct {
 	user     string
 	password string
+	host     string
 	logger   *log.Logger
 	Rmq      *amqp.Connection
 	rooms    []string
 }
 
 // NewRabbit ...
-func NewRabbit(logger *log.Logger, user, password string) *Rabbit {
+func NewRabbit(logger *log.Logger, user, password, host string) *Rabbit {
 	return &Rabbit{
 		user:     user,
 		password: password,
 		logger:   logger,
+		host:     host,
 		Rmq:      nil,
 		rooms:    []string{},
 	}
@@ -31,7 +33,7 @@ func NewRabbit(logger *log.Logger, user, password string) *Rabbit {
 // Start rabbit ...
 func (mq *Rabbit) Start() error {
 	var err error
-	mq.Rmq, err = amqp.Dial(fmt.Sprintf("amqp://%s:%s@localhost:5672/", mq.user, mq.password))
+	mq.Rmq, err = amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:5672/", mq.user, mq.password, mq.host))
 	if err != nil {
 		mq.logger.Fatalf("Failed to connect to RabbitMQ: %v", err)
 		return err

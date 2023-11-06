@@ -50,6 +50,17 @@ CONTINUE_AFTER_MIGRATE=false go run main.go`
 
 NOTE: is better to include this variables in the environmentwhen you are deploying something, just to not change or add more extra steps.
 
+## Run app with docker-compose
+First, create the image of the application: 
+- docker build -t chatapp:latest .
+
+Second, run the docker-compose.yaml file. 
+This file has all the configuration needed, no require any change. You can check the values for the mysql/rabbitmq configuration if needed.
+- docker-compose up -d
+
+And to turn off the application:
+- docker-compose down -v
+
 
 
 ## Recommendations

@@ -76,7 +76,7 @@ func (a *Api) Start(cfg *config.Configuration) error {
 	// Add the necessary things to the biz layer
 	a.bizLayer = biz.New(a.logger, a.repository)
 	// add the rabbitmq instance
-	a.bizLayer.SetRabbit(rabbitmq.NewRabbit(a.logger, cfg.RabbitMQ.User, cfg.RabbitMQ.Password))
+	a.bizLayer.SetRabbit(rabbitmq.NewRabbit(a.logger, cfg.RabbitMQ.User, cfg.RabbitMQ.Password, cfg.RabbitMQ.Host))
 
 	// start the biz
 	if err := a.bizLayer.Start(); err != nil {

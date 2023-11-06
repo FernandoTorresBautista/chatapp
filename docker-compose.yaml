@@ -1,0 +1,62 @@
+version: '3'
+services:
+  # Go App
+  go-app:
+    image: chatapp:latest
+    ports:
+      - "8080:8080"  # Adjust the port as needed
+    depends_on:
+      - mysql
+      - rabbitmq
+    environment:
+      MYSQL_HOST: mysql
+      RABBITMQ_HOST: rabbitmq
+      APP_NAME: chatapp
+      PORT: 8080
+      DB_TYPE: mysql
+      DB_MYSQL_IP: mysql:3307
+      DB_MYSQL_NAME: chatapp
+      DB_MYSQL_USER: root
+      DB_MYSQL_PASS: P@ssw0rd2023
+      DB_MYSQL_RETRY: 10
+      MIGRATE_DB_USER: root
+      MIGRATE_DB_PASS: P@ssw0rd2023
+      MIGRATE_DB: true
+      CONTINUE_AFTER_MIGRATE: true
+      RABBIT_USER: user
+      RABBIT_PASSWORD: password
+    networks:
+      - app-network
+
+  # MySQL Database
+  mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: P@ssw0rd2023
+      MYSQL_PASSWORD: P@ssw0rd2023
+      MYSQL_TCP_PORT: 3307
+    ports:
+    - 3307:3307
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - mysql-volume:/var/lib/mysql
+    networks:
+      - app-network
+
+  # RabbitMQ
+  rabbitmq:
+    image: rabbitmq:3.8-management
+    ports:
+      - "5672:5672"  # RabbitMQ messaging port
+      - "15672:15672"  # RabbitMQ management UI port
+    networks:
+      - app-network
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+
+networks:
+  app-network:
+
+volumes:
+  mysql-volume:
