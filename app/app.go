@@ -83,7 +83,7 @@ func (a *Api) Start(cfg *config.Configuration) error {
 		a.logger.Fatalf("Error stating biz layer: %#v", err)
 	}
 	// add the apis
-	a.apis = api.New(a.logger, cfg.Port, a.bizLayer)
+	a.apis = api.New(a.logger, cfg.Port, a.bizLayer, cfg.BotURL)
 	// run the apis after start the biz layer
 	if err := a.apis.Run(a.Ctx); err != nil {
 		return fmt.Errorf("Error running api: %#v", err)

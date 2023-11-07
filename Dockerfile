@@ -5,6 +5,3 @@ WORKDIR /app
 ADD . /app/
 
 RUN go build -o ./chatapp .
-EXPOSE 8080
-
-ENTRYPOINT ["./chatapp"]

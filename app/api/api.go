@@ -21,14 +21,16 @@ type HTTPIn struct {
 	port     uint
 	server   *http.Server
 	bizLayer *biz.Biz
+	botURL   string
 }
 
 // New api instance
-func New(logger *log.Logger, port uint, bizIn *biz.Biz) *HTTPIn {
+func New(logger *log.Logger, port uint, bizIn *biz.Biz, botURL string) *HTTPIn {
 	return &HTTPIn{
 		logger:   logger,
 		port:     port,
 		bizLayer: bizIn,
+		botURL:   botURL,
 	}
 }
 
@@ -48,7 +50,7 @@ func (h *HTTPIn) CreateRouter() (root *gin.Engine) {
 	root.Static("/js", "app/api/cover/js")
 
 	v1root := root.Group("")
-	v1.AddRoutes(h.logger, v1root, h.bizLayer)
+	v1.AddRoutes(h.logger, v1root, h.bizLayer, h.botURL)
 
 	root.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 

@@ -32,6 +32,8 @@ type Configuration struct {
 		User     string `default:"user" env:"RABBIT_USER"`         // defualt user for rabbit
 		Password string `default:"password" env:"RABBIT_PASSWORD"` // default password for rabbit
 	}
+
+	BotURL string `default:"localhost:8081" env:"BOT_URL"`
 }
 
 // Cfg global configuration

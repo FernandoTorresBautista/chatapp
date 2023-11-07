@@ -2,7 +2,6 @@ package v1
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -72,7 +71,18 @@ func (api *Apiv1) WebsocketHandler(c *gin.Context) {
 		// if the prefix message start with ""
 		if strings.HasPrefix(message, "/stock=") {
 			// connect with the api and send the response to the corresponding chat...
-			go api.BootToGetResponseFromTheAPI(message, roomName, api.chatRooms[roomName].List)
+			// go api.BootToGetResponseFromTheAPI(message, roomName, api.chatRooms[roomName].List)
+			go func(botURL, message, roomName string) {
+				if api.BotURL == "" {
+					api.logger.Println("Error please add the BOT_URL in the environment variables")
+					return
+				}
+				err := utils.SendBotMessage(botURL, message, roomName)
+				if err != nil {
+					api.logger.Printf("Error creating the queue :%+v, for the room: %s", err, roomName)
+					return
+				}
+			}(api.BotURL, message, roomName)
 		}
 
 		sendmsg := user.Name + ":" + string(p)
@@ -83,26 +93,26 @@ func (api *Apiv1) WebsocketHandler(c *gin.Context) {
 	}
 }
 
-// BootToGetResponseFromTheAPI ...
-func (api *Apiv1) BootToGetResponseFromTheAPI(message, roomName string, clients []*websocket.Conn) {
-	pos := strings.Index(message, "/stock=")
-	stockCode := message[pos+7:]
-	url := fmt.Sprintf(apiURL, stockCode)
-	records, err := utils.GetAPIResponse(url)
-	var p []byte
-	if err != nil {
-		api.logger.Printf("error getting response from the API: %+v\n", err)
-		p = []byte(err.Error())
-	} else {
-		api.logger.Println("close price (most representative of the day*): ", records[1][6])
-		p = []byte(fmt.Sprintf("%s quote is $%s per share", stockCode, records[1][6]))
-	}
-	err = api.bizLayer.SendMessage(websocket.TextMessage, roomName, string(p))
-	if err != nil {
-		api.logger.Fatalf("error sending the message to the queue: %+v", err)
-		return
-	}
-}
+// // BootToGetResponseFromTheAPI ...
+// func (api *Apiv1) BootToGetResponseFromTheAPI(message, roomName string, clients []*websocket.Conn) {
+// 	pos := strings.Index(message, "/stock=")
+// 	stockCode := message[pos+7:]
+// 	url := fmt.Sprintf(apiURL, stockCode)
+// 	records, err := utils.GetAPIResponse(url)
+// 	var p []byte
+// 	if err != nil {
+// 		api.logger.Printf("error getting response from the API: %+v\n", err)
+// 		p = []byte(err.Error())
+// 	} else {
+// 		api.logger.Println("close price (most representative of the day*): ", records[1][6])
+// 		p = []byte(fmt.Sprintf("%s quote is $%s per share", stockCode, records[1][6]))
+// 	}
+// 	err = api.bizLayer.SendMessage(websocket.TextMessage, roomName, string(p))
+// 	if err != nil {
+// 		api.logger.Fatalf("error sending the message to the queue: %+v", err)
+// 		return
+// 	}
+// }
 
 // CreateConsumer ....
 func (api *Apiv1) CreateConsumer(room string) {

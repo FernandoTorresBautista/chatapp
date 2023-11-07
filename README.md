@@ -37,15 +37,15 @@ The pkg folder allows to have the differents services and modules that are used 
 ## Start application
 You need to create a config.yaml file in app/config/ folder with your environment variables or locally 
 run the application with the variables before the go run, example: <br>
-`DB_TYPE='mysql' 
-DB_MYSQL_IP='localhost:3306' 
-DB_MYSQL_NAME='db_name' 
-DB_MYSQL_USER='db_user' 
-DB_MYSQL_PASS='db_pass' 
-DB_MYSQL_RETRY='5' 
-MIGRATE_DB_USER='db_user' 
-MIGRATE_DB_PASS='db_pass' 
-MIGRATE_DB=false 
+`DB_TYPE='mysql' \
+DB_MYSQL_IP='localhost:3306' \
+DB_MYSQL_NAME='db_name' \
+DB_MYSQL_USER='db_user' \
+DB_MYSQL_PASS='db_pass' \
+DB_MYSQL_RETRY='5' \
+MIGRATE_DB_USER='db_user' \
+MIGRATE_DB_PASS='db_pass' \
+MIGRATE_DB=false \
 CONTINUE_AFTER_MIGRATE=false go run main.go`
 
 NOTE: is better to include this variables in the environmentwhen you are deploying something, just to not change or add more extra steps.
@@ -62,6 +62,28 @@ And to turn off the application:
 - docker-compose down -v
 
 
+## Example of how to run the bot isolated 
+RABBITMQ_HOST='localhost' \\\
+RABBIT_USER='user' \\\
+RABBIT_PASSWORD='password' \\\
+APP_NAME='command' \\\
+PORT='8081' \\\
+go run main.go -t bot
+
+please remove any space at the end of each line to run it:
+> fer@fer:~/go/src/chatappp$ RABBITMQ_HOST='localhost' \\ \
+> RABBIT_USER='user' \\ \
+> RABBIT_PASSWORD='password' \\ \
+> APP_NAME='command' \\ \
+> PORT='8081' \\ \
+> go run main.go -t bot \\ \
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.\
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production. 
+ '<br>- using env:   export GIN_MODE=release' 
+ '<br>- using code:  gin.SetMode(gin.ReleaseMode)'
+[GIN-debug] POST   /                         --> chatapp/app/command.(*Command). handleCommand-fm (3 handlers)`
+
+In the same way works adding the missing ones for the api.<br>
 
 ## Recommendations
 For the db use golang-migrate, this [link](https://github.com/golang-migrate/migrate) get you the list of drivers <br>

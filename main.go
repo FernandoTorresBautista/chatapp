@@ -1,13 +1,18 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
-	"os"
+	"strings"
 
 	"chatapp/app"
+	"chatapp/app/biz"
 	"chatapp/app/client/db/mysql"
+	"chatapp/app/client/rabbitmq"
+	"chatapp/app/command"
 	"chatapp/app/config"
+	"chatapp/pkg/utils"
 )
 
 // variables needed
@@ -20,32 +25,12 @@ var (
 // start here what you need before to start the application
 func init() {
 	// logger for the application
-	logger = getLogger("chatapp.log", "chatapp:: ")
+	logger = utils.GetLogger("chatapp.log", "chatapp:: ")
 	// configuration environment
-	cfg = getConfig()
+	cfg = utils.GetConfig()
 	// migrate db
 	// others services should start at the biz layer instead of doing here
 	logger.Printf("Starting app %s", cfg.AppName)
-}
-
-// getLogger return the logger instance
-func getLogger(name, prefix string) *log.Logger {
-	logpath := name
-	file, err := os.Create(logpath)
-	if err != nil {
-		panic(err)
-	}
-	return log.New(file, prefix, log.LstdFlags|log.Lshortfile)
-}
-
-// getConfig return the current configuration
-func getConfig() *config.Configuration {
-	cfg := config.Cfg
-	if cfg.Fail {
-		fmt.Printf("load configuration failed: %s", cfg.FailMessage)
-		os.Exit(1)
-	}
-	return &cfg
 }
 
 // MigrateDB the db
@@ -74,6 +59,19 @@ func StartApp(logger *log.Logger, cfg *config.Configuration) {
 	logger.Printf("Service turn off")
 }
 
+// StartBot ...
+func StartBot(logger *log.Logger, cfg *config.Configuration) {
+	logger = utils.GetLogger("botcommand", "cmd :: ")
+	biz := biz.New(logger, nil)
+	logger.Println("start bot: ", cfg.RabbitMQ.User, cfg.RabbitMQ.Password, cfg.RabbitMQ.Host)
+	rmq := rabbitmq.NewRabbit(logger, cfg.RabbitMQ.User, cfg.RabbitMQ.Password, cfg.RabbitMQ.Host)
+	biz.SetRabbit(rmq)
+	ncmd := command.NewCommand(logger, cfg, biz, rmq)
+	ncmd.Start()
+	logger.Printf("running the command api")
+	ncmd.Run()
+}
+
 // main function...
 // @title chat app
 // @version 1.0
@@ -98,6 +96,16 @@ func main() {
 			return
 		}
 	}
-	// just start the application
-	StartApp(logger, cfg)
+
+	operation := flag.String("t", "api", "type: 'api' to start the http.rest web \n 'bot' to start the bot ")
+	flag.Parse()
+	fmt.Println("operation: ", *operation)
+	switch strings.ToLower(*operation) {
+	case "api":
+		// just start the application
+		StartApp(logger, cfg)
+	case "bot":
+		// start the bot
+		StartBot(logger, cfg)
+	}
 }

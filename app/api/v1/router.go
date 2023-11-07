@@ -16,16 +16,18 @@ type Apiv1 struct {
 	bizLayer  biz.Handle
 	chatRooms map[string]*models.ListWS
 	rabbit    *rabbitmq.Rabbit
+	BotURL    string
 }
 
 // AddRoutes entrypoint to add the routes to the application
-func AddRoutes(logger *log.Logger, rg *gin.RouterGroup, bizLayer *biz.Biz) {
+func AddRoutes(logger *log.Logger, rg *gin.RouterGroup, bizLayer *biz.Biz, botURL string) {
 	// create the api
 	api := Apiv1{
 		logger:    logger,
 		bizLayer:  bizLayer,
 		chatRooms: make(map[string]*models.ListWS),
 		rabbit:    bizLayer.Rabbit,
+		BotURL:    botURL,
 	}
 
 	// create the common chat
