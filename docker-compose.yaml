@@ -4,6 +4,7 @@ services:
   go-app:
     image: chatapp:latest
     command: ["/app/chatapp", "-t", "api"]
+    restart: "on-failure"
     ports:
       - "8080:8080"  # Adjust the port as needed
     depends_on:
@@ -35,6 +36,7 @@ services:
   botcommand:
     image: chatapp:latest
     command: ["/app/chatapp", "-t", "bot"]
+    restart: "on-failure"
     ports:
       - "8081:8081"  # Adjust the port as needed
     depends_on:
