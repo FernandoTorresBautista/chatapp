@@ -48,19 +48,17 @@ func (api *Apiv1) WebsocketHandler(c *gin.Context) {
 		api.chatRooms[roomName] = &models.ListWS{
 			List: []*websocket.Conn{},
 		}
+		// start once
+		err := api.bizLayer.CreateQueue(roomName)
+		if err != nil {
+			api.logger.Printf("Error creating the queue :%+v, for the room: %s", err, roomName)
+			return
+		}
+		go api.CreateConsumer(roomName)
 	}
 
 	// add the new client
 	api.chatRooms[roomName].List = append(api.chatRooms[roomName].List, conn)
-
-	// create the rabbitmq queue
-	err = api.bizLayer.CreateQueue(roomName)
-	if err != nil {
-		api.logger.Printf("error creating the queue for the room: %+v", err)
-		return
-	}
-
-	go api.CreateConsumer(roomName)
 
 	for {
 		messageType, p, err := conn.ReadMessage()
